@@ -1,19 +1,37 @@
 require('dotenv').config()
-
 const mqtt = require('mqtt')
+const crypto = require('crypto');
 
 const host = `${process.env.EVENT_HUB_NAME}.azure-devices.net`
 const port = '8883'
 const connectUrl = `mqtts://${host}:${port}`
+const endpoint = `${host}/devices/${process.env.IOT_HUB_DEVICE_ID}`
 
-const sas = "SharedAccessSignature sr=iot-hub-svc.azure-devices.net%2Fdevices%2Fdevice01&sig=QGd8dR3ec%2Ba9Mi%2F4uwx8OIip5oZ7ncO%2BUkuiJ0DOq8U%3D&se=1688714423"
+const generateSasToken = function(resourceUri, signingKey, expiresInMins=60) {
+    resourceUri = encodeURIComponent(resourceUri);
+
+    // Set expiration in seconds
+    var expires = (Date.now() / 1000) + expiresInMins * 60;
+    expires = Math.ceil(expires);
+    var toSign = resourceUri + '\n' + expires;
+
+    // Use crypto
+    var hmac = crypto.createHmac('sha256', Buffer.from(signingKey, 'base64'));
+    hmac.update(toSign);
+    var base64UriEncoded = encodeURIComponent(hmac.digest('base64'));
+
+    // Construct authorization string
+    var token = "SharedAccessSignature sr=" + resourceUri + "&sig="
+    + base64UriEncoded + "&se=" + expires;
+    return token;
+};
 
 const client = mqtt.connect(connectUrl, {
   clientId: process.env.IOT_HUB_DEVICE_ID,
   clean: false,
   connectTimeout: 4000,
   username: `${process.env.EVENT_HUB_NAME}.azure-devices.net/${process.env.IOT_HUB_DEVICE_ID}/?api-version=2021-04-12`,
-  password: sas,
+  password: generateSasToken(endpoint, process.env.DEVICE_KEY),
   reconnectPeriod: 1000,
 })
 
