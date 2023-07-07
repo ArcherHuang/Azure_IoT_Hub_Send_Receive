@@ -11,6 +11,7 @@ const consumerClient = new EventHubConsumerClient(consumerGroup,
     this.subscription = consumerClient.subscribe({
     processEvents: async (events, context) => {
         console.log(`events: ${JSON.stringify(events)}`);
+        // console.log(`events: ${JSON.stringify(events[0].body)}`);
         await context.updateCheckpoint(events[events.length - 1]);
     },
     // processError: async (err, context) => {
