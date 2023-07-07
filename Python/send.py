@@ -63,7 +63,6 @@ while True:
         "timestamp": datetime.now().strftime("%Y/%m/%d %H:%M:%S.%f")
     }
 
-    # mqtt_client.publish("devices/" + IOT_HUB_DEVICE_ID + "/messages/events/$.ct=application%2Fjson&$.ce=utf-8", payload=json.dumps(payload), qos=1)
     mqtt_client.publish(f"{PUBLISH_TOPIC_TO_IOT_HUB}$.ct=application%2Fjson&$.ce=utf-8", payload=json.dumps(payload), qos=1)
     mqtt_client.loop(2,10)
     time.sleep(1)
