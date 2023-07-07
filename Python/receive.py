@@ -1,18 +1,17 @@
+from azure.eventhub import EventHubConsumerClient
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from azure.eventhub import EventHubConsumerClient
 
-CONSUMER_GROUP = os.getenv("CONSUMER_GROUP_NAME")
-EVENT_HUB_COMPATIBLE_ENDPOINT = os.getenv("EVENTHUB_CONNECTION_STRING")
+CONSUMER_GROUP = os.getenv("CONSUMER_GROUP")
+EVENT_HUB_COMPATIBLE_ENDPOINT = os.getenv("EVENT_HUB_COMPATIBLE_ENDPOINT")
 
 def on_event_batch(partition_context, events):
     for event in events:
         # print("Received event from partition: {}.".format(partition_context.partition_id))
-        print(f"Telemetry received: {event.body_as_str()}")
+        print(f"Received: {event.body_as_str()}")
         # print(f"Properties (set by device): {event.properties}")
         # print("System properties (set by IoT Hub): ", event.system_properties)
-        print()
     partition_context.update_checkpoint()
 
 def on_error(partition_context, error):
