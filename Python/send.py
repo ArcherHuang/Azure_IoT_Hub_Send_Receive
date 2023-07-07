@@ -52,11 +52,9 @@ mqtt_client.tls_set_context(context=ssl_context)
 
 mqtt_client.connect(host=IOT_HUB_NAME + ".azure-devices.net", port=8883, keepalive=120)
 
-# start the MQTT processing loop
 mqtt_client.loop_start()
 
 while True:
-    # send telemetry
     payload = {
         "temperature": random.random(),
         "humidity": random.random(),
